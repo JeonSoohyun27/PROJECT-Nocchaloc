@@ -9,8 +9,8 @@ class Product(models.Model):
     is_new          = models.BooleanField()
     stock           = models.IntegerField()
     view_count      = models.IntegerField()
-    created_at       = models.DateTimeField(auto_now_add=True)
-    updated_at       = models.DateTimeField(auto_now=True)
+    created_at      = models.DateTimeField(auto_now_add=True)
+    updated_at      = models.DateTimeField(auto_now=True)
     product_type    = models.ForeignKey('ProductType', on_delete=models.CASCADE)
     category        = models.ForeignKey('Category', on_delete=models.CASCADE)
 
