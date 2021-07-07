@@ -16,13 +16,13 @@ class OrderStatus(models.Model):
     name = models.CharField(max_length=45)
 
     class Meta:
-        db_table = 'orderstatus'
+        db_table = 'order_status'
 
 class ItemStatus(models.Model):
     name = models.CharField(max_length=45)
 
     class Meta:
-        db_table = 'itemstatus'
+        db_table = 'item_status'
 
 class Order(models.Model):
     user         = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -40,4 +40,4 @@ class OrderItems(models.Model):
     option      = models.ForeignKey(Option, on_delete=models.SET_NULL, null=True)
 
     class Meta:
-        db_table = 'orderitems'
+        db_table = 'order_items'
