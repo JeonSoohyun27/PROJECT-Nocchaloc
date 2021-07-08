@@ -16,7 +16,7 @@ def authorization(func):
         try:
             payload = jwt.decode(token, SECRET_KEY, algorithms='HS256')
             
-            if User.objects.get(id=payload['user_id']):
+            if User.objects.filter(id=payload['user_id']).exists():
                 request.user = User.objects.get(id=payload['user_id'])
                 return func(self, request, *args, **kwargs)
             

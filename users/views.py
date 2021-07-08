@@ -7,7 +7,7 @@ from django.shortcuts       import render
 from users.models           import User
 from my_settings            import SECRET_KEY
 from datetime               import datetime, timedelta
-
+from utils                  import authorization
 # Create your views here.
 
 REGEX = {
@@ -64,3 +64,8 @@ class SigninView(View):
 
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'},status=400)
+
+    @authorization
+    def get(self,request): 
+        return JsonResponse({'message':'j1e'}, status=400)
+
