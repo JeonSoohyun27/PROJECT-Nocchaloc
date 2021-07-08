@@ -19,12 +19,12 @@ class CartView(View):
                     'option'  : cart.option.name,
                     'price'   : cart.product.price,
                 } for cart in carts]
-                
+
                 return JsonResponse({'user':request.user.id, 'cart_list':cart_list}, status=200)
             return JsonResponse({'message':'VALUE_ERROR'}, status=404)
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
-        # except TypeError:
-        #     return JsonResponse({'message':'TYPE_ERROR'}, status=400)
+        except TypeError:
+            return JsonResponse({'message':'TYPE_ERROR'}, status=400)
         except  ValueError:
             return JsonResponse({'message':'UNAUTHORIZED'}, status=401)
