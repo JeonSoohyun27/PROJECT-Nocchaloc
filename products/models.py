@@ -30,7 +30,7 @@ class ProductType(models.Model):
         db_table = 'product_types'
 
 class Option(models.Model):
-    option = models.CharField(max_length=45)
+    name   = models.CharField(max_length=45)
     price  = models.DecimalField(max_digits=18, decimal_places=2)
 
     class Meta:
