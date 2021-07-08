@@ -22,7 +22,7 @@ class SignupView(View):
             account  = data['account']
             password = data['password']
 
-            if not re.match(REGEX['account'],account) and re.match(REGEX['password'],password):
+            if not re.match(REGEX['account'],account) or not re.match(REGEX['password'],password):
                 return JsonResponse({'message':'INVALID_ERROR'},status=404)
 
             if User.objects.filter(account=data['account']).exists() or User.objects.filter(phone_number=data['phone_number']).exists():
@@ -51,16 +51,16 @@ class SigninView(View):
             if not User.objects.filter(account=data['account']).exists():
                 return JsonResponse({'message':'INVALID_USER'},status=401)
 
-            account  = data['account']
-            password = data['password']
-            user_id  = User.objects.get(account=account).id
+            account       = data['account']
+            password      = data['password']
+            user_id       = User.objects.get(account=account).id
+            user_password = User.objects.get(account=account).password.encode('utf-8')
 
-            if bcrypt.checkpw(data['password'].encode('utf-8'),User.password.encode('utf-8')):
+            if bcrypt.checkpw(data['password'].encode('utf-8'),user_password):
                 encoded_jwt = jwt.encode({'user_id':user_id,'exp':datetime.utcnow()+timedelta(days=1)},SECRET_KEY,algorithm='HS256')
                 return JsonResponse({'message':'SUCCESS','TOKEN':encoded_jwt},status=200)
+            
+            return JsonResponse({'message':'INVALID_USER'},status=401)
 
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'},status=400)
-
-        except ValueError:
-            return JsonResponse({'message':'INPUT_ERROR'},status=400)
