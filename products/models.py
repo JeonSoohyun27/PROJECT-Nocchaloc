@@ -35,3 +35,17 @@ class Option(models.Model):
 
     class Meta:
         db_table = 'options'
+
+class Image(models.Model):
+    name      = models.CharField(max_length=45)
+    image_url = models.URLField()
+
+    class Meta:
+        db_table = 'images'
+
+class Video(models.Model):
+    name      = models.CharField(max_length=45)
+    video_url = models.URLField()
+
+    class Meta:
+        db_table = 'videos'
