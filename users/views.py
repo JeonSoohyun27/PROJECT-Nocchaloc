@@ -64,8 +64,3 @@ class SigninView(View):
 
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'},status=400)
-
-    @authorization
-    def get(self,request): 
-        return JsonResponse({'message':'j1e'}, status=400)
-
