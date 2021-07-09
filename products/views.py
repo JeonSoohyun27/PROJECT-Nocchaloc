@@ -53,7 +53,7 @@ class ProductDetailView(View):
         product_info=[{
             "name"           : product.name,
             "price"          : product.price,
-            "main_iamge_url" : product.main_image_url,
+            "main_image_url" : product.main_image_url,
             "description"    : product.description
         }]
 
