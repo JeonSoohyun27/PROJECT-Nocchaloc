@@ -30,18 +30,15 @@ class CartView(View):
         except  ValueError:
             return JsonResponse({'message':'UNAUTHORIZED'}, status=401)
 
-class CartDeleteView(View):
     @authorization
-    def post(self, request):
+    def delete(self, request):
         try:
-            data = json.loads(request.body)
-            
-            for cart in data['cart_id']:
-                if not Cart.objects.filter(user=request.user, id=cart).exists:
-                    return JsonResponse({'message':'VALUE_ERROR'}, status=404)
+            carts_id = request.GET.getlist('cart_id')
 
-            for cart in data['cart_id']:
-                Cart.objects.get(user=request.user, id=cart).delete()
+            for cart in carts_id:
+                if not Cart.objects.filter(user=request.user, id=int(cart)).exists:
+                    return JsonResponse({'message':'VALUE_ERROR'}, status=404)
+                Cart.objects.get(user=request.user, id=int(cart)).delete()
 
             return JsonResponse({'message':'SUCCESS'}, status=200)
         except KeyError:
