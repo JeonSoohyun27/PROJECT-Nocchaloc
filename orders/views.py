@@ -1,4 +1,5 @@
 import json
+from products.models import Product
 
 from django.views  import View
 from django.http   import JsonResponse
@@ -51,11 +52,11 @@ class CartView(View):
     @authorization
     def patch(self, request):
         try:
-            cart_id = request.GET['cart_id']
-            option  = request.GET['option']
+            product_id = request.GET['product_id']
+            option     = request.GET['option']
 
-            if Cart.objects.filter(user=request.user, id=cart_id).exists():
-                change_cart= Cart.objects.get(id=cart_id)
+            if Cart.objects.filter(user=request.user, product=product_id).exists():
+                change_cart= Cart.objects.get(user=request.user, product=product_id)
                 if option == 'add':
                     change_cart.quantity += 1
                     change_cart.save()
