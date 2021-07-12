@@ -32,16 +32,10 @@ class ProductView(View):
             "is_new"          : product.is_new
         } for product in products]
 
-
         categories = Category.objects.all()
         category_info = [{"name" : category.name}for category in categories]
 
-        return JsonResponse({
-            "message"       : "SUCCESS",
-            "products_info" : products_info,
-            "category_info" : category_info
-        }, status=200)
-
+        return JsonResponse({"message" : "SUCCESS", "products_info" : products_info, "category_info" : category_info}, status=200)
 
 class ProductDetailView(View):
     def get(self, request, product_id):
