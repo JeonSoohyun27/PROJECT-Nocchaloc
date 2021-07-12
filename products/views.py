@@ -13,10 +13,8 @@ class ProductView(View):
 
         product_type = request.GET.getlist('product_type', None)
         category     = request.GET.get('category', None)
-        sort         = request.GET.get('sort', None) # 1~3
+        sort         = request.GET.get('sort', '1')
 
-        if not sort:
-            sort="1"
         q = Q()
         if category:
             q &= Q(category_id=category)
@@ -24,7 +22,7 @@ class ProductView(View):
             q &= Q(product_type_id__in=product_type)
 
         products = Product.objects.filter(q).order_by(sort_dic[sort])
-        products_info =[{
+        products_info = [{
             "pk"              : product.pk,
             "name"            : product.name,
             "price"           : product.price,
@@ -36,9 +34,7 @@ class ProductView(View):
 
 
         categories = Category.objects.all()
-        category_info=[{
-            "name" : category.name
-        }for category in categories]
+        category_info = [{"name" : category.name}for category in categories]
 
         return JsonResponse({
             "message"       : "SUCCESS",
@@ -50,7 +46,7 @@ class ProductView(View):
 class ProductDetailView(View):
     def get(self, request, product_id):
         product = Product.objects.get(id=product_id)
-        product_info=[{
+        product_info = [{
             "name"           : product.name,
             "price"          : product.price,
             "main_image_url" : product.main_image_url,
@@ -62,8 +58,4 @@ class ProductDetailView(View):
             "option_name"  : option.name,
             "option_price" : option.price
         }]
-        return JsonResponse({
-            "message"       : "SUCCESS",
-            "product_info"  : product_info,
-            "option_info"   : option_info
-        }, status=200)
+        return JsonResponse({"message" : "SUCCESS", "product_info" : product_info, "option_info" : option_info}, status=200)
