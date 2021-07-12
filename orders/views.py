@@ -56,13 +56,6 @@ class CartView(View):
         except  ValueError:
             return JsonResponse({'message':'UNAUTHORIZED'}, status=401)
 
-
-
-
-
-
-
-
     @authorization
     def delete(self, request):
         try:
@@ -93,7 +86,7 @@ class CartView(View):
                 if operation == 'add':
                     change_cart.quantity += 1
 
-                if operation == 'subtration':
+                if operation == 'subtraction':
                     change_cart.quantity -= 1
                 change_cart.save()
                 
