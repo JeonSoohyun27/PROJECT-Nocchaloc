@@ -1,3 +1,4 @@
+import json
 from django.db.models import Q
 from django.http import JsonResponse
 from django.views import View
@@ -5,8 +6,7 @@ from products.models import Product, Category, ProductType, Option
 
 class ProductView(View):
     def get(self, request):
-
-        sort_dic ={
+        sort_dic = {
             '1':'-is_new',
             '2':'price',
             '3':'-price'}
@@ -35,7 +35,7 @@ class ProductView(View):
         categories = Category.objects.all()
         category_info = [{"name" : category.name}for category in categories]
 
-        return JsonResponse({"message" : "SUCCESS", "products_info" : products_info, "category_info" : category_info}, status=200)
+        return JsonResponse({"products_info" : products_info, "category_info" : category_info}, status=200)
 
 class ProductDetailView(View):
     def get(self, request, product_id):
@@ -47,9 +47,13 @@ class ProductDetailView(View):
             "description"    : product.description
         }]
 
-        option = Option.objects.get(id=1)
-        option_info=[{
+        product.view_count += 1
+        product.save()
+
+        options = Option.objects.all()
+        option_info = [{
             "option_name"  : option.name,
             "option_price" : option.price
-        }]
-        return JsonResponse({"message" : "SUCCESS", "product_info" : product_info, "option_info" : option_info}, status=200)
+        } for option in options]
+
+        return JsonResponse({"product_info" : product_info, "option_info" : option_info}, status=200)
