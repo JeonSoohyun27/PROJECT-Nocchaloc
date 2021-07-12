@@ -59,11 +59,10 @@ class CartView(View):
                 change_cart = Cart.objects.get(user=request.user, product=product_id)
                 if option == 'add':
                     change_cart.quantity += 1
-                    change_cart.save()
 
                 if option == 'subtration':
                     change_cart.quantity -= 1
-                    change_cart.save()
+                change_cart.save()
                 
                 return JsonResponse({'message':'SUCCESS'}, status=200)
             return JsonResponse({'message':'VALUE_ERROR'}, status=404)
