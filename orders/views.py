@@ -29,6 +29,34 @@ class CartView(View):
         except TypeError:
             return JsonResponse({'message':'TYPE_ERROR'}, status=400)
         except  ValueError:
+            return JsonResponse({'message':'UNAUTHORIZED'}, status=401) 
+
+    @authorization
+    def post(self, request):
+        try:
+            product_id = request.GET['product_id']
+            option_id  = request.GET['option_id']
+
+            if Cart.objects.filter(product_id=product_id, option_id=option_id, user=request.user).exists():
+                add_cart = Cart.objects.get(product_id=product_id, option_id=option_id, user=request.user)
+                add_cart.quantity += 1
+                add_cart.save()
+                return JsonResponse({'message':'SUCCESS'}, status=200)
+
+            if Product.objects.filter(id=product_id).exists() and Option.objects.filter(id=option_id).exists():
+
+                Cart.objects.create(
+                    user       = request.user, 
+                    product_id = product_id, 
+                    quantity   = 1, 
+                    option_id  = option_id)
+
+                return JsonResponse({'message':'SUCCESS'}, status=201)
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)
+        except TypeError:
+            return JsonResponse({'message':'TYPE_ERROR'}, status=400)
+        except  ValueError:
             return JsonResponse({'message':'UNAUTHORIZED'}, status=401)
 
     @authorization
