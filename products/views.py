@@ -1,5 +1,4 @@
-import json
-from django.db.models import Q, query
+from django.db.models import Q
 from django.http import JsonResponse
 from django.views import View
 from products.models import Product, Category, ProductType, Option
@@ -25,6 +24,7 @@ class ProductView(View):
             products = Product.objects.filter(q).order_by(sort_dic[page])[:10]
         else:
             products = Product.objects.filter(q).order_by(sort_dic[sort])
+
         products_info = [{
             "name"            : product.name,
             "price"           : product.price,
