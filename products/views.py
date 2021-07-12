@@ -4,22 +4,6 @@ from django.http import JsonResponse
 from django.views import View
 from products.models import Product, Category, ProductType, Option
 
-class ProductMain(View):
-    def get(self, request):
-        products = Product.objects.all().order_by('-view_count')[:10]
-        products_info = [{
-            'name' : product.name,
-            'price' :  product.price,
-            'main_image_url' : product.main_image_url,
-            'hover_image_url' : product.hover_image_url
-        }for product in products]
-
-        categories = Category.objects.all()
-        category_info = [{"name": category.name} for category in categories]
-
-        # search = request.GET.get('search', None)
-        return JsonResponse({"products_info": products_info, "category_info": category_info}, status=200)
-
 class ProductView(View):
     def get(self, request):
         sort_dic = {
