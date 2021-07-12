@@ -44,14 +44,13 @@ class CartView(View):
                 return JsonResponse({'message':'SUCCESS'}, status=200)
 
             if Product.objects.filter(id=product_id).exists() and Option.objects.filter(id=option_id).exists():
-
                 Cart.objects.create(
                     user       = request.user, 
                     product_id = product_id, 
                     quantity   = 1, 
                     option_id  = option_id)
-
                 return JsonResponse({'message':'SUCCESS'}, status=201)
+                
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
         except TypeError:
