@@ -1,18 +1,18 @@
 import json
-from products.models import Product
 
-from django.views  import View
-from django.http   import JsonResponse
+from django.views    import View
+from django.http     import JsonResponse
 
-from orders.models import Cart
-from utils         import authorization
+from orders.models   import Cart
+from products.models import Product, Option
+from utils           import authorization
 
 class CartView(View):
     @authorization
     def get(self, request):
         try:
-            if Cart.objects.filter(user_id=request.user.id).exists():
-                carts = Cart.objects.filter(user_id=request.user.id)
+            if Cart.objects.filter(user=request.user).exists():
+                carts = Cart.objects.filter(user=request.user)
 
                 cart_list = [{
                     'product'    : cart.product.name,
@@ -56,10 +56,11 @@ class CartView(View):
             option     = request.GET['option']
 
             if Cart.objects.filter(user=request.user, product=product_id).exists():
-                change_cart= Cart.objects.get(user=request.user, product=product_id)
+                change_cart = Cart.objects.get(user=request.user, product=product_id)
                 if option == 'add':
                     change_cart.quantity += 1
                     change_cart.save()
+
                 if option == 'subtration':
                     change_cart.quantity -= 1
                     change_cart.save()
