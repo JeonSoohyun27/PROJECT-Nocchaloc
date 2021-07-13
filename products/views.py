@@ -58,13 +58,18 @@ class ProductReview(View):
     @authorization
     def post(self, request):
         data = json.loads(request.body)
+
         try:
+            if not Product.objects.filter(id=data['product_id']).exists():
+                return JsonResponse({'MESSAGE':'INVALID_ERROR'},status=401)
+
             Review.objects.create(
                 user       = request.user,
                 product_id = data['product_id'],
                 comment    = data['comment'],
                 score      = data['score'] 
             )
+            
 
             return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
         except KeyError:
