@@ -78,14 +78,15 @@ class CartView(View):
     def patch(self, request):
         try:
             product_id = request.GET['product_id']
-            option     = request.GET['option']
+            option_id  = request.GET['option_id']  
+            operation  = request.GET['operation']
 
-            if Cart.objects.filter(user=request.user, product=product_id).exists():
-                change_cart = Cart.objects.get(user=request.user, product=product_id)
-                if option == 'add':
+            if Cart.objects.filter(user=request.user, product=product_id, option=option_id).exists():
+                change_cart = Cart.objects.get(user=request.user, product=product_id, option=option_id)
+                if operation == 'add':
                     change_cart.quantity += 1
 
-                if option == 'subtration':
+                if operation == 'subtraction':
                     change_cart.quantity -= 1
                 change_cart.save()
                 
