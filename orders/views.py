@@ -56,13 +56,6 @@ class CartView(View):
         except  ValueError:
             return JsonResponse({'message':'UNAUTHORIZED'}, status=401)
 
-
-
-
-
-
-
-
     @authorization
     def delete(self, request):
         try:
