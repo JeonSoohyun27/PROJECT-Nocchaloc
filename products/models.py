@@ -47,8 +47,9 @@ class Image(models.Model):
         db_table = 'images'
 
 class Video(models.Model):
-    name      = models.CharField(max_length=45)
-    video_url = models.URLField()
+    name        = models.CharField(max_length=45)
+    description = models.TextField(default="")
+    video_url   = models.URLField()
 
     class Meta:
         db_table = 'videos'
