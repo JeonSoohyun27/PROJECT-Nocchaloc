@@ -1,32 +1,41 @@
+from math import ceil
 from django.db.models import Q
 from django.http import JsonResponse
 from django.views import View
+
 from products.models import Product, Category, Option, Review
 from utils import authorization
 import json
+
 
 class ProductView(View):
 
     def get(self, request):
         sort_dic = {
-            '1':'-is_new',
-            '2':'-price',
-            '3':'price',
-            'm':'-view_count'}
+            '1': '-is_new',
+            '2': '-price',
+            '3': 'price',
+            'm': '-view_count'}
         MAIN_AMOUNT  = 10
+        PAGE_SIZE    = 24
         product_type = request.GET.getlist('product_type', None)
         category     = request.GET.get('category', None)
         sort         = request.GET.get('sort', '1')
         page         = request.GET.get('page', None)
+        limit        = int(request.GET.get('limit', PAGE_SIZE))
+        offset       = int(request.GET.get('offset', 0))
 
         q = Q()
         if category:
-            q &= Q(category_id=category)
+            q &= Q(category_id = category)
         if product_type:
-            q &= Q(product_type_id__in=product_type)
+            q &= Q(product_type_id__in = product_type)
 
-        products = Product.objects.filter(q).order_by(sort_dic[sort])
-        if page =='m':
+        total_products = Product.objects.filter(q).order_by(sort_dic[sort])
+        total_page     = ceil(total_products.count()/PAGE_SIZE)
+        products       = total_products[offset:limit]
+
+        if page == 'm':
             products = Product.objects.filter(q).order_by(sort_dic[page])[0:MAIN_AMOUNT]
 
         products_info = [{
@@ -39,10 +48,15 @@ class ProductView(View):
             "is_new"          : product.is_new     if page != 'm' else None
         } for product in products]
 
+        data = [{
+            "total_page"     : total_page,
+            "total_products" : total_products.count()
+        }]
+
         categories = Category.objects.all()
         category_info = [{"name" : category.name} for category in categories]
 
-        return JsonResponse({"products_info" : products_info, "category_info" : category_info}, status=200)
+        return JsonResponse({"products_info":products_info, "category_info":category_info, "data":data}, status=200)
 
 class ProductDetailView(View):
     def get(self, request, product_id):
@@ -63,7 +77,7 @@ class ProductDetailView(View):
             "option_price" : option.price
         } for option in options]
 
-        return JsonResponse({"product_info" : product_info, "option_info" : option_info}, status=200)
+        return JsonResponse({"product_info":product_info, "option_info":option_info}, status=200)
 
 class ProductReview(View):
     @authorization
@@ -78,7 +92,7 @@ class ProductReview(View):
                 user       = request.user,
                 product_id = data['product_id'],
                 comment    = data['comment'],
-                score      = data['score'] 
+                score      = data['score']
             )
             
             return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
