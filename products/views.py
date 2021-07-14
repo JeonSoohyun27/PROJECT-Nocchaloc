@@ -2,14 +2,11 @@ from math import ceil
 from django.db.models import Q
 from django.http import JsonResponse
 from django.views import View
-<<<<<<< HEAD
 
-from products.models import Product, Category, Option
-=======
 from products.models import Product, Category, Option, Review
 from utils import authorization
 import json
->>>>>>> main
+
 
 class ProductView(View):
 
