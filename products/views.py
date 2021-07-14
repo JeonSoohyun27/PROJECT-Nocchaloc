@@ -2,8 +2,14 @@ from math import ceil
 from django.db.models import Q
 from django.http import JsonResponse
 from django.views import View
+<<<<<<< HEAD
 
 from products.models import Product, Category, Option
+=======
+from products.models import Product, Category, Option, Review
+from utils import authorization
+import json
+>>>>>>> main
 
 class ProductView(View):
 
@@ -53,7 +59,7 @@ class ProductView(View):
         categories = Category.objects.all()
         category_info = [{"name" : category.name} for category in categories]
 
-        return JsonResponse({"products_info" : products_info, "category_info" : category_info, "data" : data}, status=200)
+        return JsonResponse({"products_info":products_info, "category_info":category_info, "data":data}, status=200)
 
 class ProductDetailView(View):
     def get(self, request, product_id):
@@ -74,4 +80,24 @@ class ProductDetailView(View):
             "option_price" : option.price
         } for option in options]
 
-        return JsonResponse({"product_info" : product_info, "option_info" : option_info}, status=200)
+        return JsonResponse({"product_info":product_info, "option_info":option_info}, status=200)
+
+class ProductReview(View):
+    @authorization
+    def post(self, request):
+        data = json.loads(request.body)
+
+        try:
+            if not Product.objects.filter(id=data['product_id']).exists():
+                return JsonResponse({'MESSAGE':'INVALID_ERROR'},status=401)
+
+            Review.objects.create(
+                user       = request.user,
+                product_id = data['product_id'],
+                comment    = data['comment'],
+                score      = data['score']
+            )
+            
+            return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
+        except KeyError:
+            return JsonResponse({'MESSAGE':'KEYERROR'}, status=400)

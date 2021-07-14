@@ -1,4 +1,7 @@
-from django.db import models
+from django.db                  import models
+from django.db.models.deletion  import CASCADE
+
+from users.models               import User
 
 class Product(models.Model):
     name            = models.CharField(max_length=45)
@@ -44,8 +47,20 @@ class Image(models.Model):
         db_table = 'images'
 
 class Video(models.Model):
-    name      = models.CharField(max_length=45)
-    video_url = models.URLField()
+    name        = models.CharField(max_length=45)
+    description = models.TextField(default="")
+    video_url   = models.URLField()
 
     class Meta:
         db_table = 'videos'
+
+class Review(models.Model):
+    user        = models.ForeignKey(User, on_delete=CASCADE)
+    product     = models.ForeignKey(Product, on_delete=CASCADE)
+    comment     = models.CharField(max_length=200,blank=False,null=False)
+    score       = models.DecimalField(max_digits=2,decimal_places=1)
+    create_time = models.DateTimeField(auto_now_add=True)
+    update_time = models.DateTimeField(auto_now=True)
+
+    class Mete:
+        db_table = 'reviews'
