@@ -98,3 +98,26 @@ class ProductReview(View):
             return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
         except KeyError:
             return JsonResponse({'MESSAGE':'KEYERROR'}, status=400)
+
+    def get(self, request):
+        try:
+            product_id = request.GET['product_id']
+            if Product.objects.filter(id=product_id).exists():
+                reviews = Review.objects.filter(product=product_id)
+                product_review=[]
+                for review in reviews:
+                    product_review.append({
+                        "user"        : review.user.account,
+                        "comment"     : review.comment,
+                        "score"       : review.score,
+                        "create_time" : review.create_time,
+                        "update_time" : review.update_time,
+                    })
+                return JsonResponse({'product':product_id,'result':product_review},status=200)
+            
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)
+        except TypeError:
+            return JsonResponse({'message':'TYPE_ERROR'}, status=400)
+        except ValueError:
+            return JsonResponse({'message':'UNAUTHORIZED'}, status=401)
