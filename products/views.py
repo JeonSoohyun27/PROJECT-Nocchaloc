@@ -1,10 +1,9 @@
 from math import ceil
-
 from django.db.models import Q
 from django.http import JsonResponse
 from django.views import View
-from products.models import Product, Category, Option
 
+from products.models import Product, Category, Option
 
 class ProductView(View):
 
@@ -26,13 +25,13 @@ class ProductView(View):
 
         q = Q()
         if category:
-            q &= Q(category_id=category)
+            q &= Q(category_id = category)
         if product_type:
-            q &= Q(product_type_id__in=product_type)
+            q &= Q(product_type_id__in = product_type)
 
         total_products = Product.objects.filter(q).order_by(sort_dic[sort])
-        total_page = ceil(total_products.count()/PAGE_SIZE)
-        products = total_products[offset:limit]
+        total_page     = ceil(total_products.count()/PAGE_SIZE)
+        products       = total_products[offset:limit]
 
         if page == 'm':
             products = Product.objects.filter(q).order_by(sort_dic[page])[0:MAIN_AMOUNT]
@@ -48,8 +47,8 @@ class ProductView(View):
         } for product in products]
 
         data = [{
-            "total_page"    : total_page,
-            "total_products": total_products.count()
+            "total_page"     : total_page,
+            "total_products" : total_products.count()
         }]
 
         categories = Category.objects.all()
@@ -61,10 +60,10 @@ class ProductDetailView(View):
     def get(self, request, product_id):
         product = Product.objects.get(id=product_id)
         product_info = [{
-            "name": product.name,
-            "price": product.price,
-            "main_image_url": product.main_image_url,
-            "description": product.description
+            "name"           : product.name,
+            "price"          : product.price,
+            "main_image_url" : product.main_image_url,
+            "description"    : product.description
         }]
 
         product.view_count += 1
@@ -72,8 +71,8 @@ class ProductDetailView(View):
 
         options = Option.objects.all()
         option_info = [{
-            "option_name": option.name,
-            "option_price": option.price
+            "option_name"  : option.name,
+            "option_price" : option.price
         } for option in options]
 
-        return JsonResponse({"product_info": product_info, "option_info": option_info}, status=200)
+        return JsonResponse({"product_info" : product_info, "option_info" : option_info}, status=200)
