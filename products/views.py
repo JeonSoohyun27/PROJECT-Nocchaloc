@@ -22,8 +22,7 @@ class SearchView(View):
                 'name'           :search.name,
                 'price'          :search.price,
                 'main_image_url' :search.main_image_url,
-                'hover_image_url':search.hover_image_url,
-                'review'         :search.review_count
+                'hover_image_url':search.hover_image_url
             } for search in search_list]
 
             return JsonResponse({'search_list':context, 'search_word':word}, status = 200)
