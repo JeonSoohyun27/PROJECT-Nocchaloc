@@ -13,7 +13,6 @@ class ProductView(View):
             '2': '-price',
             '3': 'price',
             'm': '-view_count'}
-
         MAIN_AMOUNT  = 10
         PAGE_SIZE    = 24
         product_type = request.GET.getlist('product_type', None)
