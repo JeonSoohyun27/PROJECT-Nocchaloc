@@ -1,12 +1,12 @@
+import json
 from math import ceil
-from django.db.models import Q
-from django.http import JsonResponse
-from django.views import View
+
+from django.views     import View
+from django.db.models import Q, Count
+from django.http      import JsonResponse
 
 from products.models import Product, Category, Option, Review
 from utils import authorization
-import json
-
 
 class ProductView(View):
 
@@ -83,18 +83,40 @@ class ProductReview(View):
     @authorization
     def post(self, request):
         data = json.loads(request.body)
-
         try:
             if not Product.objects.filter(id=data['product_id']).exists():
                 return JsonResponse({'MESSAGE':'INVALID_ERROR'},status=401)
-
             Review.objects.create(
                 user       = request.user,
                 product_id = data['product_id'],
                 comment    = data['comment'],
                 score      = data['score']
             )
-            
             return JsonResponse({'MESSAGE':'SUCCESS'}, status=201)
         except KeyError:
             return JsonResponse({'MESSAGE':'KEYERROR'}, status=400)
+
+class SearchView(View):
+    def post(self, request):
+        try:
+            page        = int(request.GET.get('page', 1))
+            PAGE_SIZE   = 24
+            limit       = int(PAGE_SIZE * page)
+            offset      = int(limit - PAGE_SIZE)
+
+            word        = request.GET.get('word', None)
+            search_list = Product.objects.filter(Q(name__icontains=word) | Q(description__icontains=word)).annotate(review_count=Count('review')).order_by('-review_count')[offset:limit]
+            context     = [{
+                'name'           :search.name,
+                'price'          :search.price,
+                'main_image_url' :search.main_image_url,
+                'hover_image_url':search.hover_image_url
+            } for search in search_list]
+
+            return JsonResponse({'search_list':context, 'search_word':word}, status = 200)
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)
+        except TypeError:
+            return JsonResponse({'message':'TYPE_ERROR'}, status=400)
+        except ValueError:
+            return JsonResponse({'message':'UNAUTHORIZED'}, status=401)
