@@ -100,9 +100,9 @@ class SearchView(View):
     def post(self, request):
         try:
             page        = int(request.GET.get('page', 1))
-            page_size   = 24
-            limit       = int(page_size * page)
-            offset      = int(limit - page_size)
+            PAGE_SIZE   = 24
+            limit       = int(PAGE_SIZE * page)
+            offset      = int(limit - PAGE_SIZE)
 
             word        = request.GET.get('word', None)
             search_list = Product.objects.filter(Q(name__icontains=word) | Q(description__icontains=word)).annotate(review_count=Count('review')).order_by('-review_count')[offset:limit]
