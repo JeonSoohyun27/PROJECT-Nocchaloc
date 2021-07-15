@@ -4,7 +4,7 @@ from django.db.models import Q
 from django.views    import View
 from django.http     import JsonResponse
 
-from orders.models   import Cart, Order, OrderStatus
+from orders.models   import Cart, Order, OrderStatus, OrderItems, ItemStatus
 from products.models import Product, Option
 from utils           import authorization
 
@@ -16,6 +16,7 @@ class CartView(View):
                 carts = Cart.objects.filter(user=request.user)
 
                 cart_list = [{
+                    'cart_id'    : cart.pk,
                     'product'    : cart.product.name,
                     'quantity'   : cart.quantity,
                     'option'     : cart.option.name,
@@ -103,17 +104,28 @@ class CartView(View):
 class OrderView(View):
     @authorization
     def post(self, request):
-        user  = request.user
-        check = request.GET.get('check', None)
-        orderStatus = OrderStatus.object.first()
+        user         = request.user
+        select_carts = request.GET.getlist("cart_id")
 
-        if not check :
-            return JsonResponse({'message':'VALUE_ERROR'}, status=404)
-
-        Order.objects.create(
-            user         = user.pk,
-            order_status = orderStatus
+        orderStatus  = OrderStatus.objects.all().first()
+        order = Order.objects.create(
+            user_id         = user.pk,
+            order_status_id = orderStatus.pk
         )
+
+        carts      = Cart.objects.filter(Q(id__in=select_carts))
+        itemStatus = ItemStatus.objects.all().first()
+        for cart in carts:
+            OrderItems.objects.create(
+                product     = cart.product,
+                item_status = itemStatus,
+                order       = order,
+                quantity    = cart.quantity,
+                option      = cart.option
+            )
+            cart.product.stock-=cart.quantity
+            cart.product.save()
+        carts.delete()
 
         return JsonResponse({'message': 'SUCCESS'}, status=200)
 
@@ -123,25 +135,21 @@ class OrderView(View):
         orders = Order.objects.filter(id=user.pk).order_by("-created_at")
 
         orders_info = [{
-            "product"   : order.order_items_set.product.name,
-            "status"    : order.order_status
+            "order_id"     : order.pk,
+            "status"       : order.order_status.name
         } for order in orders]
 
         return JsonResponse({'user_name':user.name, 'order_info':orders_info}, status=200)
 
 class OrderItemView(View):
     @authorization
-    def post(self, request):
-        select_carts = request.GET.getlist("carts")
-        carts = Cart.obejects.filter(Q(cart_id__in=select_carts))
-        order = Order.objects.filter(id=request.user.id).order_by("-created_at").first()
+    def get(self, request, order_id):
+        orderitems = OrderItems.objects.filter(order_id=order_id)
 
-        for cart in carts :
-            cart_info=[{
-                "product_name": cart.product.name
-            }]
-
-
-
-
-        return JsonResponse({'message': 'SUCCESS'}, status=201)
+        orderitems_info =[{
+            "product_name" : orderitem.product.name,
+            "item_status"  : orderitem.item_status.name,
+            "quantity"     : orderitem.quantity,
+            "option"       : orderitem.option.name
+        } for orderitem in orderitems]
+        return JsonResponse({'order_item_info': orderitems_info}, status=201)
