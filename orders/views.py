@@ -1,9 +1,10 @@
 import json
 
+from django.db.models import Q
 from django.views    import View
 from django.http     import JsonResponse
 
-from orders.models   import Cart, OrderItems, Order, OrderStatus
+from orders.models   import Cart, Order, OrderStatus
 from products.models import Product, Option
 from utils           import authorization
 
@@ -119,7 +120,7 @@ class OrderView(View):
     @authorization
     def get(self, request):
         user = request.user
-        orders = Order.objects.filter(id=user.pk)
+        orders = Order.objects.filter(id=user.pk).order_by("-created_at")
 
         orders_info = [{
             "product"   : order.order_items_set.product.name,
@@ -128,12 +129,17 @@ class OrderView(View):
 
         return JsonResponse({'user_name':user.name, 'order_info':orders_info}, status=200)
 
-
 class OrderItemView(View):
     @authorization
     def post(self, request):
-        carts = request.GET.getlist("carts")
+        select_carts = request.GET.getlist("carts")
+        carts = Cart.obejects.filter(Q(cart_id__in=select_carts))
         order = Order.objects.filter(id=request.user.id).order_by("-created_at").first()
+
+        for cart in carts :
+            cart_info=[{
+                "product_name": cart.product.name
+            }]
 
 
 

@@ -32,3 +32,4 @@ class Order(models.Model):
 
     class Meta:
         db_table = 'orders'
+
