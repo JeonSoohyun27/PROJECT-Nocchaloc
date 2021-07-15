@@ -1,6 +1,5 @@
 import json
 
-from django.db.models import Q
 from django.views    import View
 from django.http     import JsonResponse
 
@@ -104,18 +103,19 @@ class CartView(View):
 class OrderView(View):
     @authorization
     def post(self, request):
-        user         = request.user
-        select_carts = request.GET.getlist("cart_id")
-        total_price = int(request.GET.get("total_price"))
+        data           = json.loads(request.body)
+        user           = request.user
+        selected_carts = request.GET.getlist("selected_carts")
+        total_price    = data["total_price"]
 
-        orderStatus  = OrderStatus.objects.all().first()
+        orderStatus  = OrderStatus.objects.first()
         order = Order.objects.create(
             user_id         = user.pk,
             order_status_id = orderStatus.pk
         )
 
-        carts      = Cart.objects.filter(Q(id__in=select_carts))
-        itemStatus = ItemStatus.objects.all().first()
+        carts      = Cart.objects.filter(id__in=selected_carts)
+        itemStatus = ItemStatus.objects.first()
         for cart in carts:
             OrderItems.objects.create(
                 product     = cart.product,
@@ -155,4 +155,4 @@ class OrderItemView(View):
             "quantity"     : orderitem.quantity,
             "option"       : orderitem.option.name
         } for orderitem in orderitems]
-        return JsonResponse({'order_item_info': orderitems_info}, status=201)
+        return JsonResponse({'order_item_info': orderitems_info}, status=200)
