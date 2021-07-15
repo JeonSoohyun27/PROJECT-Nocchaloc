@@ -38,6 +38,5 @@ class OrderItems(models.Model):
     order       = models.ForeignKey(Order, on_delete=models.CASCADE)
     quantity    = models.IntegerField()
     option      = models.ForeignKey(Option, on_delete=models.SET_NULL, null=True)
-
     class Meta:
         db_table = 'order_items'
