@@ -130,7 +130,7 @@ class OrderView(View):
         user.save()
         carts.delete()
 
-        return JsonResponse({'message': 'SUCCESS'}, status=200)
+        return JsonResponse({'message': 'SUCCESS'}, status=201)
 
     @authorization
     def get(self, request):
