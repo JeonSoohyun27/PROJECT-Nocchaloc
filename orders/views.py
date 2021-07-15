@@ -106,6 +106,7 @@ class OrderView(View):
     def post(self, request):
         user         = request.user
         select_carts = request.GET.getlist("cart_id")
+        total_price = int(request.GET.get("total_price"))
 
         orderStatus  = OrderStatus.objects.all().first()
         order = Order.objects.create(
@@ -125,6 +126,8 @@ class OrderView(View):
             )
             cart.product.stock-=cart.quantity
             cart.product.save()
+        user.point-=total_price
+        user.save()
         carts.delete()
 
         return JsonResponse({'message': 'SUCCESS'}, status=200)
