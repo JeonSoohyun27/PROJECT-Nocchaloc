@@ -2,7 +2,7 @@ import jwt
 
 from django.http             import JsonResponse
 
-from nocchaloc.settings      import SECRET_KEY
+from nocchaloc.settings      import ALGORITHM,SECRET_KEY
 from users.models            import User
 
 def authorization(func):
@@ -14,7 +14,7 @@ def authorization(func):
             return JsonResponse({'error':'ENTER_THE_TOKEN'}, status=401)
         
         try:
-            payload = jwt.decode(token, SECRET_KEY, algorithms='HS256')
+            payload = jwt.decode(token, SECRET_KEY, ALGORITHM=ALGORITHM)
             
             if User.objects.filter(id=payload['user_id']).exists():
                 request.user = User.objects.get(id=payload['user_id'])

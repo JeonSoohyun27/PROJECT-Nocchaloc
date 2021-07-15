@@ -79,7 +79,7 @@ class ProductDetailView(View):
 
         return JsonResponse({"product_info":product_info, "option_info":option_info}, status=200)
 
-class ProductReview(View):
+class ProductReviewView(View):
     @authorization
     def post(self, request):
         data = json.loads(request.body)
@@ -111,6 +111,21 @@ class ProductReview(View):
 
                 return JsonResponse({'product':product_id,'result':product_review},status=200)
             return JsonResponse({'message':'VALUE_ERROR'},status=404)
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)
+        except TypeError:
+            return JsonResponse({'message':'TYPE_ERROR'}, status=400)
+        except ValueError:
+            return JsonResponse({'message':'UNAUTHORIZED'}, status=401)
+
+    @authorization
+    def delete(self, request, review_id):
+        try:
+            if Review.objects.filter(id=review_id).exists():
+                Review.objects.get(id=review_id).delete()
+                return JsonResponse({'message':'SUCCESS'},status=200)
+            return JsonResponse({'message':'VALUE_ERROR'},status=404)
+
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'}, status=400)
         except TypeError:
