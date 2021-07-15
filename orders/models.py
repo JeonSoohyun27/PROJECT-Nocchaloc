@@ -32,4 +32,13 @@ class Order(models.Model):
 
     class Meta:
         db_table = 'orders'
-
+        
+class OrderItems(models.Model):
+    product     = models.ForeignKey(Product, on_delete=models.CASCADE)
+    item_status = models.ForeignKey(ItemStatus, on_delete=models.SET_NULL, null=True)
+    order       = models.ForeignKey(Order, on_delete=models.CASCADE)
+    quantity    = models.IntegerField()
+    option      = models.ForeignKey(Option, on_delete=models.SET_NULL, null=True)
+    
+    class Meta:
+        db_table = 'order_items'
