@@ -3,7 +3,7 @@ import json
 from django.views    import View
 from django.http     import JsonResponse
 
-from orders.models   import Cart
+from orders.models   import Cart, OrderItems, Order, OrderStatus
 from products.models import Product, Option
 from utils           import authorization
 
@@ -89,7 +89,7 @@ class CartView(View):
                 if operation == 'subtraction':
                     change_cart.quantity -= 1
                 change_cart.save()
-                
+
                 return JsonResponse({'message':'SUCCESS'}, status=200)
             return JsonResponse({'message':'VALUE_ERROR'}, status=404)
         except KeyError:
@@ -98,3 +98,44 @@ class CartView(View):
             return JsonResponse({'message':'TYPE_ERROR'}, status=400)
         except  ValueError:
             return JsonResponse({'message':'UNAUTHORIZED'}, status=401)
+
+class OrderView(View):
+    @authorization
+    def post(self, request):
+        user  = request.user
+        check = request.GET.get('check', None)
+        orderStatus = OrderStatus.object.first()
+
+        if not check :
+            return JsonResponse({'message':'VALUE_ERROR'}, status=404)
+
+        Order.objects.create(
+            user         = user.pk,
+            order_status = orderStatus
+        )
+
+        return JsonResponse({'message': 'SUCCESS'}, status=200)
+
+    @authorization
+    def get(self, request):
+        user = request.user
+        orders = Order.objects.filter(id=user.pk)
+
+        orders_info = [{
+            "product"   : order.order_items_set.product.name,
+            "status"    : order.order_status
+        } for order in orders]
+
+        return JsonResponse({'user_name':user.name, 'order_info':orders_info}, status=200)
+
+
+class OrderItemView(View):
+    @authorization
+    def post(self, request):
+        carts = request.GET.getlist("carts")
+        order = Order.objects.filter(id=request.user.id).order_by("-created_at").first()
+
+
+
+
+        return JsonResponse({'message': 'SUCCESS'}, status=201)

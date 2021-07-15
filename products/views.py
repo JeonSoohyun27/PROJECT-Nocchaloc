@@ -3,7 +3,7 @@ from django.db.models import Q
 from django.http import JsonResponse
 from django.views import View
 
-from products.models import Product, Category, Option, Review
+from products.models import Product, Category, Option, Review, Video
 from utils import authorization
 import json
 
@@ -56,7 +56,14 @@ class ProductView(View):
         categories = Category.objects.all()
         category_info = [{"name" : category.name} for category in categories]
 
-        return JsonResponse({"products_info":products_info, "category_info":category_info, "data":data}, status=200)
+        videos = Video.objects.all()
+        video_info = [{
+            "name"        : video.name,
+            "description" : video.description,
+            "video_url"   : video.video_url
+        } for video in videos]
+
+        return JsonResponse({"products_info":products_info, "category_info":category_info, "data":data, "video":video_info}, status=200)
 
 class ProductDetailView(View):
     def get(self, request, product_id):
