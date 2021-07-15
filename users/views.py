@@ -11,9 +11,9 @@ from utils                  import authorization
 # Create your views here.
 
 REGEX = {
-    'account'  : '[a-zA-Z]\w{4,12}',
-    'password' : '(?=.*[a-zA-Z])((?=.*\d)|(?=.*\W)).{8,16}'
-}
+    'account'  : '[a-zA-Z0-9]{4,12}',
+    'password' : '(?=.*[a-zA-Z0-9])((?=.*\d)|(?=.*\W)).{8,16}'
+}                  
 
 class SignupView(View):
     def post(self, request):
@@ -21,7 +21,6 @@ class SignupView(View):
             data     = json.loads(request.body)
             account  = data['account']
             password = data['password']
-
             if not re.match(REGEX['account'],account) or not re.match(REGEX['password'],password):
                 return JsonResponse({'message':'INVALID_ERROR'},status=404)
 
@@ -29,7 +28,7 @@ class SignupView(View):
                 return JsonResponse({'message':'DUPLICATE'},status=409)
 
             encoded_password = bcrypt.hashpw(data['password'].encode('utf-8'), bcrypt.gensalt())
-
+            
             User.objects.create(
                 phone_number = data['phone_number'],
                 name         = data['name'],
@@ -39,7 +38,6 @@ class SignupView(View):
                 point        = 50000,
             )
             return JsonResponse({'message':'SUCCESS'},status=201)
-
         except KeyError:
             return JsonResponse({'message':'KEY_ERROR'},status=400)
 
