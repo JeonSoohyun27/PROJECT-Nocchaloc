@@ -5,14 +5,14 @@ from django.http            import JsonResponse
 from django.shortcuts       import render
 
 from users.models           import User
-from my_settings            import SECRET_KEY
+from my_settings            import ALGORITHM, SECRET_KEY
 from datetime               import datetime, timedelta
 from utils                  import authorization
 # Create your views here.
 
 REGEX = {
-    'account'  : '[a-zA-Z0-9]{4,12}',
-    'password' : '(?=.*[a-zA-Z0-9])((?=.*\d)|(?=.*\W)).{8,16}'
+    'account'  : '^[a-zA-Z0-9]\w{4,12}$',
+    'password' : '^(?=.*[a-zA-Z0-9])((?=.*\d)|(?=.*\W)).{8,16}$'
 }                  
 
 class SignupView(View):
@@ -45,19 +45,16 @@ class SigninView(View):
     def post(self, request):
         try:
             data = json.loads(request.body)
-            
             if not User.objects.filter(account=data['account']).exists():
                 return JsonResponse({'message':'INVALID_USER'},status=401)
-
             account       = data['account']
             password      = data['password']
             user_id       = User.objects.get(account=account).id
             user_password = User.objects.get(account=account).password.encode('utf-8')
 
             if bcrypt.checkpw(data['password'].encode('utf-8'),user_password):
-                encoded_jwt = jwt.encode({'user_id':user_id,'exp':datetime.utcnow()+timedelta(days=1)},SECRET_KEY,algorithm='HS256')
+                encoded_jwt = jwt.encode({'user_id':user_id,'exp':datetime.utcnow()+timedelta(days=1)},SECRET_KEY,ALGORITHM=ALGORITHM)
                 return JsonResponse({'message':'SUCCESS','TOKEN':encoded_jwt},status=200)
-            
             return JsonResponse({'message':'INVALID_USER'},status=401)
 
         except KeyError:
