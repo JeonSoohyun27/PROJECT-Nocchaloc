@@ -13,7 +13,7 @@
 
 ## 📍 프로젝트 진행
 - Trello를 이용한 Scrum관리
-https://files.slack.com/files-pri/TH0U6FBTN-F028BUDCGTX/image.png
+![](https://files.slack.com/files-pri/TH0U6FBTN-F028BUDCGTX/image.png)
 - 매일 어제 한 일, 오늘 할 일, 특이사항 공유
 - 미팅전 Agenda 공유 
 
