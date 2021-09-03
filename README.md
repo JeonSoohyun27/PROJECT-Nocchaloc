@@ -31,9 +31,10 @@
 ||리뷰 CRUD||
 
 ## 📍 내가 맡은 파트
-- 장바구니 CRUD
-- 제품 검색
-- Api documentation
+- AqueryTool을 이용한 RDBMS 모델링
+- Trello를 이용한 Scrum방식으로 협업 진행
+- 회원가입 및 로그인(Bcrypt 암호화, JWT 사용, 정규표현식을 사용한 Validation)
+- 상품에 대한 상품평 CRUD 기능 구현
 
 ## 📍 API Documentation
 https://documenter.getpostman.com/view/16450829/Tzm8EErD
