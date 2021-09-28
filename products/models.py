@@ -63,4 +63,4 @@ class Review(models.Model):
     update_time = models.DateTimeField(auto_now=True)
 
     class Mete:
-        db_table = 'reviews'
+        db_table = 'products_review'

@@ -14,7 +14,7 @@ def authorization(func):
             return JsonResponse({'error':'ENTER_THE_TOKEN'}, status=401)
         
         try:
-            payload = jwt.decode(token, SECRET_KEY, ALGORITHM=ALGORITHM)
+            payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
             
             if User.objects.filter(id=payload['user_id']).exists():
                 request.user = User.objects.get(id=payload['user_id'])

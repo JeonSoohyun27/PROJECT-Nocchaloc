@@ -103,9 +103,9 @@ class ProductReviewView(View):
         except KeyError:
             return JsonResponse({'MESSAGE':'KEY_ERROR'}, status=400)
 
-    def get(self, request):
+    def get(self, request, product_id):
         try:
-            product_id = request.GET['product_id']
+            # product_id = request.GET['product_id']
             if Product.objects.filter(id=product_id).exists():
                 reviews = Review.objects.filter(product=product_id)
 
@@ -139,6 +139,29 @@ class ProductReviewView(View):
             return JsonResponse({'message':'TYPE_ERROR'}, status=400)
         except ValueError:
             return JsonResponse({'message':'UNAUTHORIZED'}, status=401)
+
+    @authorization
+    def patch(self, request, review_id):
+        data = json.loads(request.body)
+        try:
+            if Review.objects.filter(id=review_id).exists():
+                old_review = Review.objects.get(id=review_id)
+                old_review.comment = data['comment']
+                old_review.save()
+                return JsonResponse({'message':'SUCCESS'}, status=200)
+            
+            return JsonResponse({'message':'VALUE_ERROR'}, status=404)
+        except KeyError:
+            return JsonResponse({'message':'KEY_ERROR'}, status=400)
+        except TypeError:
+            return JsonResponse({'message':'TYPE_ERROR'}, status=400)
+        except  ValueError:
+            return JsonResponse({'message':'UNAUTHORIZED'}, status=401)
+
+
+
+
+
 
 class SearchView(View):
     def post(self, request):
